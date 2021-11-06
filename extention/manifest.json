@@ -1,0 +1,15 @@
+{
+  "name": "Auto Play",
+  "description": "Auto connection  !",
+  "version": "1.0",
+  "manifest_version": 2,
+  "content_scripts": [
+    {
+      "matches": ["https://ld3-gc-188.prdaldb18a1.com/*"],    
+      "js": ["content.js"]
+    }
+  ],
+  "icons": {
+    "32": "icon.png"
+  }
+}
