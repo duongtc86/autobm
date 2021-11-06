@@ -1,0 +1,291 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Document</title>
+    <link href="https://fonts.googleapis.com/css?family=Roboto:100,300,400,500,700,900" rel="stylesheet" />
+    <link href="https://cdn.jsdelivr.net/npm/@mdi/font@4.x/css/materialdesignicons.min.css" rel="stylesheet" />
+    <link href="https://cdn.jsdelivr.net/npm/vuetify@2.x/dist/vuetify.min.css" rel="stylesheet" />
+    <meta name="viewport" content="width=device-width, initial-scale=1,
+            maximum-scale=1, user-scalable=no, minimal-ui" />
+    <script src="https://cdn.jsdelivr.net/npm/vue@2.x/dist/vue.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/vuetify@2.x/dist/vuetify.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/flv.js/1.3.2/flv.min.js"
+        integrity="sha512-viIpeG+70da8uvm9aktaT4dXxlalio52xjaKmGSjiUXrfPo4jRlp6elFvAEuV7GxmVB/qwQZiCQNadaF3DfVZg=="
+        crossorigin="anonymous"></script>
+    <link rel="stylesheet" href="./css/style.css" />
+</head>
+
+<body>
+    <div id="app">
+        <v-app>
+            <v-card class="mx-auto mt-1 d-flex flex-column" height="96%" shaped>
+                <div class="main">
+                    <div class="ctrl">
+                        <v-icon large color="red darken-2" @click="load_video()">mdi-play-circle-outline</v-icon>
+                    </div>
+
+                    <v-snackbar timeout="3000" v-model="ketqua" centered top color="red accent-4" elevation="24">
+                        Kết quả vòng quay : <strong> {{result}}</strong>
+
+                    </v-snackbar>
+                    <v-btn class="btn-time red white--text" elevation="2" small fab>{{countdownTimer}}</v-btn>
+                    <video id="videos" autoplay playsinline muted height="250" controls></video>
+                </div>
+                <v-alert text type="info" class="font-weight-bold text-capitalize">
+                    {{message}}
+                </v-alert>
+                <!-- <div class="subtitle-2 font-weight-bold text-capitalize py-2 px-4 red w">
+                    bảng điều khiển
+
+                </div> -->
+                <v-card-text>
+                    <div class="d-flex justify-space-around">
+                        <v-badge :content="win" value="messages" color="red" overlap>
+                            <v-icon x-large color="primary"> mdi-cloud-check </v-icon>
+                        </v-badge>
+                        <v-badge :content="lose" value="messages" color="blue" overlap>
+                            <v-icon x-large color="error"> mdi-cloud-off-outline </v-icon>
+                        </v-badge>
+                        <v-badge :content="losetemp" value="messages" color="purple" overlap>
+                            <v-icon x-large color="warning"> mdi-cloud-sync </v-icon>
+                        </v-badge>
+                        <v-badge :content="losemax" value="messages" color="orange" overlap>
+                            <v-icon x-large color="purple"> mdi-cloud-upload </v-icon>
+                        </v-badge>
+                        <v-btn fab dark small outlined color="red" @click='reset_play()'>
+                            <v-icon dark>
+                                mdi-delete-sweep
+                            </v-icon>
+                        </v-btn>
+                    </div>
+                    <div class="d-flex justify-space-around pt-8 input_control">
+                        <div>
+                            <v-text-field :value="tiencuoc" label="Tiền cược" outlined readonly dense prefix="$">
+                            </v-text-field>
+                        </div>
+                        <div>
+                            <v-text-field label="Lợi nhuận" :value="loinhuan" prefix="$" outlined readonly dense>
+                            </v-text-field>
+                        </div>
+                    </div>
+
+                    <v-btn block color="indigo" dark v-if="autoplay" @click='auto_play()'>Auto Play</v-btn>
+
+
+                </v-card-text>
+                <v-spacer></v-spacer>
+                <v-divider></v-divider>
+                <v-card-actions class="flex-column">
+                    <div class="text-center">
+                        <v-btn text color="teal accent-4" @click="reveal = true">
+                            cài đặt
+                        </v-btn>
+                    </div>
+                </v-card-actions>
+
+                <v-expand-transition>
+                    <v-card v-if="reveal" class="transition-fast-in-fast-out v-card--reveal" style="height: 100%">
+                        <v-card-text class="pb-0">
+                            <v-text-field label="Cược min" v-model='cuocmin' prefix="$"></v-text-field>
+                            <v-text-field label="Vòng cược" v-model="vongcuoc" prefix="$"></v-text-field>
+                            <v-text-field label="Vốn" v-model="von" readonly prefix="$"></v-text-field>
+                        </v-card-text>
+                        <v-card-actions class="pt-0">
+                            <v-btn text color="teal accent-4" @click="reveal = false">
+                                Close
+                            </v-btn>
+                        </v-card-actions>
+                    </v-card>
+                </v-expand-transition>
+            </v-card>
+
+        </v-app>
+    </div>
+    <script>
+        var flvPlayer;
+        function load_video() {
+            if (flvjs.isSupported()) {
+                var videoElement = document.getElementById("videos");
+                if (flvPlayer !== undefined) {
+                    flvPlayer.destroy();
+                }
+
+                flvPlayer = flvjs.createPlayer({
+                    type: "flv",
+                    isLive: true,
+                    hasAudio: false,
+                    url: "https://ld3-strm-edge-188.prdaldb18a1.com/live/0801_dealerPC2.flv",
+                });
+                flvPlayer.duration = 20000;
+                flvPlayer.attachMediaElement(videoElement);
+                flvPlayer.load();
+                flvPlayer.play();
+
+                // videoElement.addEventListener('dblclick', function () {
+                //     console.log('remove');
+                //     flvPlayer.destroy();
+
+                // });
+            }
+        }
+
+        document.addEventListener("DOMContentLoaded", function (event) {
+            load_video();
+        });
+        let ws;
+        function getfic(f) {
+            if (f === 1 || f === 2)
+                return 1;
+            return getfic(f - 1) + getfic(f - 2);
+        }
+        function sumfic(f) {
+            var sum = 0;
+            for (var i = 1; i <= f; i++) {
+                sum += getfic(i);
+            }
+            return sum;
+        }
+        function backfic(f) {
+            var ln = getfic(f) * 1.5;
+            var sum = 0;
+            var vt = 1;
+            for (var i = f - 1; i >= 1; i--) {
+                sum += getfic(i);
+                if (ln < sum) {
+                    vt = i;
+                    break;
+                }
+            }
+            return vt;
+        }
+        console.log(backfic(11));
+
+
+        let app = new Vue({
+            el: "#app",
+            vuetify: new Vuetify(),
+            data: {
+                reveal: false,
+                autoplay: true,
+                countdownTimer: 0,
+                gameStatus: 0,
+                isPause: false,
+                historyList: -1,
+                message: '  bảng điều khiển',
+                ketqua: false,
+                result: -1,
+                cuocmin: 5000,
+                vongcuoc: 15,
+                von: 0,
+                tiencuoc: 0,
+                loinhuan: 0,
+                win: 0,
+                lose: 0,
+                losetemp: 1,
+                losemax: 1
+
+            },
+            created: function () {
+                var ketnoi = function () {
+                    ws = new WebSocket("ws:" + window.location.host);
+                    ws.onopen = function () {
+                        console.log("open server");
+                    };
+
+                    ws.onmessage = function (e) {
+                        var res = JSON.parse(e.data);
+                        // console.log(res);
+                        if (res.type === 'countdownTimer') {
+                            app.countdownTimer = res.data
+                        }
+                        if (res.type === 'gameStatus') {
+                            var mes = '';
+                            if (res.data === 1) {
+                                mes = 'vòng cược mới';
+
+                            }
+                            if (res.data === 2) {
+                                mes = 'đang đếm lùi';
+                            }
+                            if (res.data === 3) {
+                                mes = 'đang đợi kết quả';
+                            }
+                            app.message = mes;
+                        }
+                        if (res.type === 'historyList') {
+                            app.result = res.data.result[0];
+                            app.ketqua = true;
+                            if (app.autoplay === false) {
+
+                                if (res.data.result[0] === 2) {
+                                    app.win++;
+                                    app.loinhuan += app.tiencuoc * 1.5;
+                                    app.losetemp = backfic(app.losetemp);
+                                    app.tiencuoc = getfic(app.losetemp) * app.cuocmin;
+                                    console.log(app.losetemp);
+                                }
+                                else {
+                                    app.lose++;
+                                    app.losetemp++;
+                                    app.loinhuan -= app.tiencuoc;
+                                    app.tiencuoc = getfic(app.losetemp) * app.cuocmin;
+                                    if (app.losetemp > app.losemax) {
+                                        app.losemax = app.losetemp;
+                                    }
+                                }
+                            }
+                        }
+                    };
+                    ws.onclose = function (e) {
+                        setTimeout(function () {
+                            ketnoi();
+                        }, 1000);
+                    };
+                };
+                ketnoi();
+                this.tiencuoc = this.cuocmin;
+                this.von = sumfic(this.vongcuoc) * this.tiencuoc;
+                this.loinhuan = this.von;
+
+            },
+            methods: {
+                send_data: function (a) {
+                    ws.send(a);
+                },
+                auto_play: function () {
+                    this.autoplay = false;
+                },
+                reset_play: function () {
+                    this.autoplay = true;
+                    this.tiencuoc = this.cuocmin;
+                    this.loinhuan = this.von;
+                    this.win = 0;
+                    this.lose = 0;
+                    this.losetemp = 1;
+                    this.losemax = 1
+                },
+                load_video: function () {
+                    load_video();
+                }
+
+            },
+            watch: {
+                cuocmin: function (val) {
+                    this.cuocmin = val;
+                    this.tiencuoc = val;
+                    this.von = sumfic(this.vongcuoc) * val;
+                },
+                vongcuoc: function (val) {
+                    this.von = sumfic(val) * this.cuocmin;
+                }
+            }
+        });
+    </script>
+    <!-- <script src="./js/index.js"></script> -->
+</body>
+
+</html>
