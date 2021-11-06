@@ -83,7 +83,7 @@ window.onload = function () {
 
   }
   function ketnoi() {
-      my_web_socket = new WebSocket("ws://localhost:3000");
+    my_web_socket = new WebSocket("wss://autobm.herokuapp.com/");  
       my_web_socket.onopen = function (e) {
         console.log("open server")
       };
