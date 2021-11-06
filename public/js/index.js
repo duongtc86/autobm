@@ -12,7 +12,7 @@ let app = new Vue({
     },
     created: function () {
         var ketnoi = function () {
-            ws = new WebSocket("ws:" + window.location.host);
+            ws = new WebSocket("wss://autobm.herokuapp.com/");
             ws.onopen = function () {
                 ws.send(
                     JSON.stringify({
