@@ -191,7 +191,7 @@
             },
             created: function () {
                 var ketnoi = function () {
-                    ws = new WebSocket("ws:" + window.location.host);
+                    ws = new WebSocket("wss:" + window.location.host);
                     ws.onopen = function () {
                         console.log("open server");
                     };
