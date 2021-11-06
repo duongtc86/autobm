@@ -21,7 +21,7 @@
 // };
 
 window.onload = function () {
-  var my_web_socket = new WebSocket("ws://localhost:3000");  
+  var my_web_socket = new WebSocket("wss://autobm.herokuapp.com/");  
   WebSocket.prototype._send = WebSocket.prototype.send;
   WebSocket.prototype.send = function (data) {
       this._send(data);
