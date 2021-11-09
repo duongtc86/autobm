@@ -1,0 +1,1 @@
+app.tiencuoc=12000;
